@@ -5,14 +5,21 @@
 		<BepInExDirectory>C:\Users\<USERNAME>\AppData\Roaming\Thunderstore Mod Manager\DataFolder\LethalCompany\profiles\modding\BepInEx</BepInExDirectory>
 	</PropertyGroup>
 
-	<!-- Networking Patching -->
 	<Target Name="CopyDLLs" AfterTargets="NetcodePatch">
 		<Message Text="Executing CopyDLLs task" Importance="High" />
 
 		<!-- Auto copy dlls to mod profile -->
-		<Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="$(BepInExDirectory)\plugins" />
-		<Copy SourceFiles="$(TargetDir)Assets/modnetworkhandlerbundle" DestinationFolder="$(BepInExDirectory)\plugins" />
+		<Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="$(BepInExDirectory)\plugins\Um_no-LethalCredit" />
+
 		<Message Text="Copied build files" Importance="High" />
+	</Target>
+
+	<Target Name="CopyAssets" AfterTargets="Build">
+		<Message Text="Executing CopyAssets Task" Importance="High" />
+
+		<Copy SourceFiles="$(ProjectDir)Assets\lethalcreditbundle" DestinationFolder="$(BepInExDirectory)\plugins\Um_no-LethalCredit" />
+
+		<Message Text="Copied Assets" Importance="High" />
 	</Target>
 
 </Project>

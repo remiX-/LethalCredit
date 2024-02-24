@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using LethalCredit.Assets;
-using LethalCredit.Service;
+using LethalCredit.Manager.Bank;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -24,7 +24,7 @@ internal class NetworkObjectManager
         hasInit = true;
 
         networkPrefab = AssetManager.CustomAssets.LoadAsset<GameObject>("ModNetworkHandler");
-
+        networkPrefab.AddComponent<BankNetworkHandler>();
         NetworkManager.Singleton.AddNetworkPrefab(networkPrefab);
     }
 

@@ -1,6 +1,4 @@
-﻿using LethalCredit;
-
-namespace LethalCredit.Service;
+﻿namespace LethalCredit;
 
 internal class ModLogger
 {

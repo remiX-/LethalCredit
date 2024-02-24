@@ -1,5 +1,4 @@
-﻿using LethalCredit.Service;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -14,10 +13,13 @@ internal class AssetManager
     private static string _modRoot;
     private static readonly Dictionary<string, string> AssetPaths = new()
     {
-        { "ATM", "assets/lethalcredit/prefabs/atm.prefab" },
-        { "CreditCard", "assets/lethalcredit/prefabs/creditcarditem.asset" }
+        { "ATM", "Assets/LethalCredit/Prefabs/ATM.prefab" },
+        { "CreditCard", "Assets/LethalCredit/Prefabs/CreditCardItem.asset" },
+        { "DollarStack", "Assets/LethalCredit/Prefabs/DollarStackItem.asset" }
     };
     internal static readonly Dictionary<string, GameObject> Prefabs = new();
+
+    public static readonly Dictionary<string, Object> AssetCache = new();
 
     internal static void LoadModBundle(string root)
     {
@@ -31,9 +33,13 @@ internal class AssetManager
 
     public static T LoadBundleAsset<T>(string itemName) where T : Object
     {
+        if (AssetCache.TryGetValue(itemName, out var value)) return (T)value;
+
         if (AssetPaths.TryGetValue(itemName, out var path))
         {
-            return TryLoadBundleAsset<T>(ref CustomAssets, path);
+            var asset = TryLoadBundleAsset<T>(ref CustomAssets, path);
+            AssetCache.Add(itemName, asset);
+            return asset;
         }
 
         Logger.LogError($"{itemName} was not present in the asset or sample dictionary!");
@@ -44,7 +50,7 @@ internal class AssetManager
     {
         var result = bundle.LoadAsset<T>(path);
 
-        if (result == null)
+        if (result is null)
         {
             Logger.LogError($"An error has occurred trying to load asset from {path}");
             return null;

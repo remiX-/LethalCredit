@@ -1,6 +1,7 @@
 ﻿using BepInEx.Configuration;
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel;
 
 namespace LethalCredit;
 
@@ -29,5 +30,15 @@ internal class PluginConfig
 
     public void ApplyHostConfig(PluginConfig hostConfig)
     {
+    }
+
+    public void DebugPrintConfig(ModLogger logger)
+    {
+        foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(this))
+        {
+            var name = descriptor.Name;
+            var value = descriptor.GetValue(this);
+            logger.LogDebug($"{name}={value}");
+        }
     }
 }

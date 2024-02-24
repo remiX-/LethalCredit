@@ -2,11 +2,14 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using LethalCredit.Assets;
+using LethalCredit.Manager.Saves;
 using LethalLib.Extras;
 using LethalLib.Modules;
+using QualityCompany.Manager.ShipTerminal;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
+using static QualityCompany.Service.GameEvents;
 
 namespace LethalCredit;
 
@@ -15,15 +18,12 @@ namespace LethalCredit;
 [BepInDependency("umno.QualityCompany")]
 public class Plugin : BaseUnityPlugin
 {
-    private readonly Harmony harmony = new(PluginMetadata.PLUGIN_GUID);
-
     internal static Plugin Instance;
-
     internal ManualLogSource Log;
-
     internal PluginConfig PluginConfig;
-
     internal string PluginPath;
+
+    private readonly Harmony _harmony = new(PluginMetadata.PLUGIN_GUID);
 
     private void Awake()
     {
@@ -48,10 +48,29 @@ public class Plugin : BaseUnityPlugin
 
     private void Patch()
     {
-        // AdvancedTerminalRegistry.Register(Assembly.GetExecutingAssembly(), description: "QualityCompany provides auto-sell functionality with a few commands.");
-        // ModuleRegistry.Register(Assembly.GetExecutingAssembly());
+        AdvancedTerminalRegistry.Register(Assembly.GetExecutingAssembly(), description: "Lethal Credit Union is great.");
 
-        harmony.PatchAll(Assembly.GetExecutingAssembly());
+        _harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+        HudManagerStart += _ =>
+        {
+            SaveManager.Load();
+        };
+
+        Disconnected += _ =>
+        {
+            SaveManager.Save();
+        };
+
+        EndOfGame += instance =>
+        {
+            Logger.LogMessage($"StartOfRound.EndOfGame, allDead? {instance.allPlayersDead}");
+
+            if (!instance.allPlayersDead) return;
+
+            SaveManager.SaveData.BankBalance = 0;
+            SaveManager.Save();
+        };
     }
 
     private static void NetcodePatcher()
@@ -103,16 +122,24 @@ public class Plugin : BaseUnityPlugin
             price: 1
         );
 
+        // cc
         var cc = AssetManager.LoadBundleAsset<Item>("CreditCard");
         Utilities.FixMixerGroups(cc.spawnPrefab);
-
         NetworkPrefabs.RegisterNetworkPrefab(cc.spawnPrefab);
-
-        // AssetManager.AddPrefab("CreditCard", cc);
 
         var infoNode = ScriptableObject.CreateInstance<TerminalNode>();
         infoNode.clearPreviousText = true;
         infoNode.displayText = "A credit card?!\n\n";
         Items.RegisterShopItem(cc, 25);
+
+        // dollarstack
+        var ds = AssetManager.LoadBundleAsset<Item>("DollarStack");
+        Utilities.FixMixerGroups(ds.spawnPrefab);
+        NetworkPrefabs.RegisterNetworkPrefab(ds.spawnPrefab);
+
+        var dsinfoNode = ScriptableObject.CreateInstance<TerminalNode>();
+        dsinfoNode.clearPreviousText = true;
+        dsinfoNode.displayText = "Money.\n\n";
+        Items.RegisterShopItem(ds, 25);
     }
 }
