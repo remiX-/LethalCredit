@@ -12,7 +12,7 @@ namespace LethalCredit;
 
 [BepInPlugin(PluginMetadata.PLUGIN_GUID, PluginMetadata.PLUGIN_NAME, PluginMetadata.PLUGIN_VERSION)]
 [BepInDependency("evaisa.lethallib")]
-[BepInDependency("um_no.QualityCompany")]
+[BepInDependency("umno.QualityCompany")]
 public class Plugin : BaseUnityPlugin
 {
     private readonly Harmony harmony = new(PluginMetadata.PLUGIN_GUID);
@@ -75,7 +75,7 @@ public class Plugin : BaseUnityPlugin
     {
         AssetManager.LoadModBundle(PluginPath);
 
-        var atmItem = AssetManager.GetItemObject("ATM");
+        var atmItem = AssetManager.LoadBundleAsset<GameObject>("ATM");
 
         NetworkPrefabs.RegisterNetworkPrefab(atmItem);
         AssetManager.AddPrefab("ATM", atmItem);
@@ -102,5 +102,17 @@ public class Plugin : BaseUnityPlugin
             itemInfo: itemInfoNode,
             price: 1
         );
+
+        var cc = AssetManager.LoadBundleAsset<Item>("CreditCard");
+        Utilities.FixMixerGroups(cc.spawnPrefab);
+
+        NetworkPrefabs.RegisterNetworkPrefab(cc.spawnPrefab);
+
+        // AssetManager.AddPrefab("CreditCard", cc);
+
+        var infoNode = ScriptableObject.CreateInstance<TerminalNode>();
+        infoNode.clearPreviousText = true;
+        infoNode.displayText = "A credit card?!\n\n";
+        Items.RegisterShopItem(cc, 25);
     }
 }

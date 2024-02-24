@@ -23,7 +23,7 @@ internal class NetworkObjectManager
 
         hasInit = true;
 
-        networkPrefab = AssetManager.CustomAssets.LoadAsset<GameObject>("TODO");
+        networkPrefab = AssetManager.CustomAssets.LoadAsset<GameObject>("ModNetworkHandler");
 
         NetworkManager.Singleton.AddNetworkPrefab(networkPrefab);
     }

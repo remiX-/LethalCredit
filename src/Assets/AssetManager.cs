@@ -15,34 +15,34 @@ internal class AssetManager
     private static readonly Dictionary<string, string> AssetPaths = new()
     {
         { "ATM", "assets/lethalcredit/prefabs/atm.prefab" },
-        { "CreditCard", "assets/lethalcredit/prefabs/creditcard.prefab" }
+        { "CreditCard", "assets/lethalcredit/prefabs/creditcarditem.asset" }
     };
     internal static readonly Dictionary<string, GameObject> Prefabs = new();
 
     internal static void LoadModBundle(string root)
     {
         _modRoot = root;
-        CustomAssets = AssetBundle.LoadFromFile(Path.Combine(_modRoot, "qualitycompanybundle"));
+        CustomAssets = AssetBundle.LoadFromFile(Path.Combine(_modRoot, "lethalcreditbundle"));
         if (CustomAssets is null)
         {
             Logger.LogError("Failed to load custom assets!");
         }
     }
 
-    public static GameObject GetItemObject(string itemName)
+    public static T LoadBundleAsset<T>(string itemName) where T : Object
     {
         if (AssetPaths.TryGetValue(itemName, out var path))
         {
-            return TryLoadItemAsset(ref CustomAssets, path);
+            return TryLoadBundleAsset<T>(ref CustomAssets, path);
         }
 
         Logger.LogError($"{itemName} was not present in the asset or sample dictionary!");
-        return null;
+        return default;
     }
 
-    internal static GameObject TryLoadItemAsset(ref AssetBundle bundle, string path)
+    internal static T TryLoadBundleAsset<T>(ref AssetBundle bundle, string path) where T : Object
     {
-        var result = bundle.LoadAsset<GameObject>(path);
+        var result = bundle.LoadAsset<T>(path);
 
         if (result == null)
         {
