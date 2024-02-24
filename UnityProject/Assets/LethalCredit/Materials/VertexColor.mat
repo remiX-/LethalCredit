@@ -263,10 +263,10 @@ Material:
     - _IridescenceMask: 1
     - _IridescenceThickness: 1
     - _LightmapUV: 0
-    - _LinkDetailsWithBase: 1
+    - _LinkDetailsWithBase: 0
     - _MaskBlendSrc: 1
     - _MaterialID: 1
-    - _Metallic: 0.362
+    - _Metallic: 0.10694457
     - _MetallicRemapMax: 0.362
     - _MetallicRemapMin: 0
     - _Mode: 0
@@ -292,10 +292,10 @@ Material:
     - _RequireSplitLighting: 0
     - _SecondarySpecular: 1
     - _SecondarySpecularShift: 0.9
-    - _Smoothness: 0.5
+    - _Smoothness: 0.376
     - _SmoothnessMax: 0.7
     - _SmoothnessMin: 0.3
-    - _SmoothnessRemapMax: 1
+    - _SmoothnessRemapMax: 0.376
     - _SmoothnessRemapMin: 0
     - _SmoothnessTextureChannel: 0
     - _Specular: 1
