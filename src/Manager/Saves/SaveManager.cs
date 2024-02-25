@@ -10,7 +10,7 @@ internal class SaveManager
 {
     private static readonly ModLogger Logger = new(nameof(SaveManager));
 
-    internal static GameSaveData SaveData { get; private set; }
+    internal static GameSaveData SaveData { get; private set; } = new();
 
     private static bool IsHost => GameNetworkManager.Instance.isHostingGame;
 
@@ -28,7 +28,7 @@ internal class SaveManager
         {
             Save();
 
-            SaveData = null;
+            SaveData = new();
         };
 
         EndOfGame += instance =>

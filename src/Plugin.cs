@@ -1,7 +1,7 @@
 using BepInEx;
 using BepInEx.Logging;
+using HarmonyLib;
 using LethalCredit.Assets;
-using LethalCredit.Manager.Saves;
 using LethalCredit.Network;
 using LethalLib.Extras;
 using LethalLib.Modules;
@@ -24,7 +24,7 @@ public class Plugin : BaseUnityPlugin
     internal PluginConfig PluginConfig;
     internal string PluginPath;
 
-    // private readonly Harmony _harmony = new(PluginMetadata.PLUGIN_GUID);
+    private readonly Harmony _harmony = new(PluginMetadata.PLUGIN_GUID);
 
     private void Awake()
     {
@@ -66,12 +66,9 @@ public class Plugin : BaseUnityPlugin
 
     private void Patch()
     {
-        AdvancedTerminalRegistry.Register(Assembly.GetExecutingAssembly(), commandName: "lcu", description: "Lethal Credit Union is great.");
+        AdvancedTerminalRegistry.Register(Assembly.GetExecutingAssembly(), commandKeyword: "lcu", description: "Lethal Credit Union is great.");
 
-        // _harmony.PatchAll(Assembly.GetExecutingAssembly());
-
-        ModNetworkManager.Init();
-        SaveManager.Init();
+        _harmony.PatchAll(typeof(ModNetworkManager));
     }
 
     private void LoadAssets()

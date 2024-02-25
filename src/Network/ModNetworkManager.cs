@@ -1,5 +1,7 @@
-﻿using LethalCredit.Assets;
+﻿using HarmonyLib;
+using LethalCredit.Assets;
 using LethalCredit.Manager.Bank;
+using LethalCredit.Manager.Saves;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -13,14 +15,12 @@ internal class ModNetworkManager
     private static bool _hasInit;
     private static readonly List<GameObject> _networkPrefabs = new ();
 
-    internal static void Init()
-    {
-        GameNetworkManagerStart += _ => Start();
-        StartOfRoundAwake += _ => Load();
-    }
-
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(GameNetworkManager), "Start")]
     public static void Start()
     {
+        Plugin.Instance.Log.LogMessage("GameNetworkManager.Start");
+        SaveManager.Init();
         if (_networkPrefab is not null || _hasInit) return;
 
         _hasInit = true;
@@ -39,8 +39,11 @@ internal class ModNetworkManager
         }
     }
 
-    public static void Load()
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(StartOfRound), "Awake")]
+    public static void AwakePatch(StartOfRound __instance)
     {
+        Plugin.Instance.Log.LogMessage("StartOfRound.Awake");
         if (!NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsServer) return;
         if (_networkPrefab is null) return;
 

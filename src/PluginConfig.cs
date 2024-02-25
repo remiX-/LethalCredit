@@ -40,14 +40,21 @@ internal class PluginConfig
             true,
             "[HOST] Whether the bank will accept you offering up available credits. This is only allowed on the day of deadline."
         ).Value;
-        #endregion
 
-        #region Debug
         BankCreditsRatePercentage = configFile.Bind(
-            "Debug",
+            "Bank",
             "Banking credits rate percentage",
             50,
             "[HOST] The banking percentage rate of giving your credits to The Lethal Credit Union."
+        ).Value;
+        #endregion
+
+        #region Debug
+        ShowDebugLogs = configFile.Bind(
+            "Debug",
+            "ShowDebugLogs",
+            false,
+            "[CLIENT] Turn on/off debug logs."
         ).Value;
         #endregion
     }
