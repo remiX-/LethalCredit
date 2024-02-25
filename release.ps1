@@ -1,14 +1,14 @@
 $DistDir = "$PSScriptRoot\dist"
 $BuildDir = "$DistDir\build"
 $ReleaseDir = "$DistDir\release"
-$xml = [xml](Get-Content $PSScriptRoot\src\QualityCompany.csproj)
+$xml = [xml](Get-Content $PSScriptRoot\src\LethalCredit.csproj)
 $Version = $xml.Project.PropertyGroup.Version
-$ZipFile = "$ReleaseDir\QualityCompany_$Version.zip"
+$ZipFile = "$ReleaseDir\LethalCredit_$Version.zip"
 $ReleaseAssetBundleArtifact = "$PSScriptRoot\src\Assets\modnetworkhandlerbundle"
-$ReleaseDllArtifact = "$PSScriptRoot\src\bin\Release\netstandard2.1\QualityCompany.dll"
-$ReleaseXmlDocsArtifact = "$PSScriptRoot\src\bin\Release\netstandard2.1\QualityCompany.xml"
+$ReleaseDllArtifact = "$PSScriptRoot\src\bin\Release\netstandard2.1\LethalCredit.dll"
+$ReleaseXmlDocsArtifact = "$PSScriptRoot\src\bin\Release\netstandard2.1\LethalCredit.xml"
 
-Write-Output "Creating build for QualityCompany v$Version"
+Write-Output "Creating build for LethalCredit v$Version"
 
 # cleanup build directory
 Remove-Item $BuildDir -Recurse -Force -ErrorAction SilentlyContinue
@@ -46,7 +46,6 @@ CopyItemToBuild $PSScriptRoot\README.md
 CopyItemToBuild $PSScriptRoot\CHANGELOG.md
 CopyItemToBuild $ReleaseAssetBundleArtifact
 CopyItemToBuild $ReleaseDllArtifact
-CopyItemToBuild $ReleaseXmlDocsArtifact
 
 # create the zip in ReleaseDir
 Get-ChildItem -Path $BuildDir | Compress-Archive -DestinationPath $ZipFile
