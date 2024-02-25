@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace LethalCredit.Commands;
+
 internal class DepositCommand
 {
     private static List<GrabbableObject> _recommendedScraps = new();
@@ -15,16 +16,22 @@ internal class DepositCommand
     [TerminalCommand]
     private static TerminalCommandBuilder Deposit()
     {
-        return new TerminalCommandBuilder("lc.deposit")
+        return new TerminalCommandBuilder("lcu deposit")
+            .WithDescription("Let LCU take some scrap for you")
             .WithSubCommand(CreateDepositSubCommand())
-            .AddTextReplacement("[valueFor]", () => $"${_valueFor}")
+            .AddTextReplacement("[d_valueFor]", () => $"${_valueFor}")
             .AddTextReplacement("[depositActualTotal]", () => $"${_recommendedScraps.ScrapValueOfCollection()}")
             .AddTextReplacement("[depositScrapCombo]", GenerateDepositScrapComboText)
             .AddTextReplacement("[numScrapDeposited]", () => _recommendedScraps.Count)
-            .AddTextReplacement("[newBalance]", () => $"${SaveManager.SaveData.BankBalance - _valueFor}")
-            .AddTextReplacement("[bankBalance]", () => $"${SaveManager.SaveData.BankBalance}")
-            .WithCondition("hasScrapItems", "Bruh, you don't even have any items.", () => ScrapUtils.GetAllScrapInShip().Count > 0)
-            .WithCondition("notEnoughScrap", "Not enough scrap to meet [sellScrapFor] credits.\nTotal value: [sellScrapActualTotal].", () => _valueFor < ScrapUtils.GetShipTotalSellableScrapValue());
+            .AddTextReplacement("[d_newBalance]", () => $"${SaveManager.SaveData.BankBalance - _valueFor}")
+            .AddTextReplacement("[d_bankBalance]", () => $"${SaveManager.SaveData.BankBalance}")
+            .AddTextReplacement("[d_shipActualTotal]", () => $"${ScrapUtils.GetShipTotalIncludedScrapValue(Plugin.Instance.PluginConfig.BankIgnoreList)}")
+            .WithCondition("hasScrapItems", "You do not own any scrap.",
+                () => ScrapUtils.GetAllScrapInShip().Count > 0)
+            .WithCondition("depositMoreThanZero", "Do you really think you can deposit nothing?", () => _valueFor > 0)
+            .WithCondition("notEnoughScrap",
+                "LCU is not happy with this. You do not enough scrap to deposit [d_valueFor].\n\nYour currently have a total of [d_shipActualTotal].",
+                () => _valueFor < ScrapUtils.GetShipTotalIncludedScrapValue(Plugin.Instance.PluginConfig.BankIgnoreList));
 
         static string GenerateDepositScrapComboText()
         {
@@ -34,41 +41,13 @@ internal class DepositCommand
                 .Select(x => $"{x.itemProperties.name}: {x.scrapValue}")
                 .Aggregate((first, next) => $"{first}\n{next}");
         }
-    }
-
-    [TerminalCommand]
-    private static TerminalCommandBuilder Withdraw()
-    {
-        return new TerminalCommandBuilder("lc.withdraw")
-            .WithSubCommand(CreateWithdrawSubCommand())
-            .AddTextReplacement("[valueFor]", () => $"${_valueFor}")
-            .AddTextReplacement("[depositActualTotal]", () => $"${_recommendedScraps.ScrapValueOfCollection()}")
-            .AddTextReplacement("[depositScrapCombo]", GenerateDepositScrapComboText)
-            .AddTextReplacement("[numScrapDeposited]", () => _recommendedScraps.Count)
-            .WithCondition("hasEnoughBalance", "You do not have enough moneh, current balance: [bankBalance]. git gud", () => SaveManager.SaveData.BankBalance >= _valueFor);
-
-        static string GenerateDepositScrapComboText()
-        {
-            if (_recommendedScraps is null || _recommendedScraps.Count == 0) return "No items";
-
-            return _recommendedScraps
-                .Select(x => $"{x.itemProperties.name}: {x.scrapValue}")
-                .Aggregate((first, next) => $"{first}\n{next}");
-        }
-    }
-
-    [TerminalCommand]
-    private static TerminalCommandBuilder Balance()
-    {
-        return new TerminalCommandBuilder("lc.balance")
-            .WithAction(() => $"Your balance is ${SaveManager.SaveData.BankBalance}");
     }
 
     private static TerminalSubCommandBuilder CreateDepositSubCommand()
     {
         return new TerminalSubCommandBuilder("<amount>")
             .WithDescription("Deposit as close as possible to input amount")
-            .WithMessage("Requesting to deposit value close to [valueFor].\n\nLethal Credit Union will accept the following items for a total of [depositActualTotal]:\n[depositScrapCombo]")
+            .WithMessage("Requesting to deposit value close to [d_valueFor].\n\nLethal Credit Union will accept the following items for a total of [depositActualTotal]:\n[depositScrapCombo]")
             .EnableConfirmDeny(confirmMessage: "Deposited [numScrapDeposited] scrap items for [depositActualTotal].")
             .WithConditions("hasScrapItems", "notEnoughScrap")
             .WithInputMatch(@"^(\d+)$")
@@ -78,7 +57,7 @@ internal class DepositCommand
 
                 if (_valueFor <= 0) return false;
 
-                _recommendedScraps = ScrapUtils.GetScrapForAmount(_valueFor)
+                _recommendedScraps = GetScrapForDeposit(_valueFor)
                     .OrderBy(x => x.itemProperties.name)
                     .ThenByDescending(x => x.scrapValue)
                     .ToList();
@@ -93,23 +72,67 @@ internal class DepositCommand
             });
     }
 
-    private static TerminalSubCommandBuilder CreateWithdrawSubCommand()
+    private static IEnumerable<GrabbableObject> GetScrapForDeposit(int amount)
     {
-        return new TerminalSubCommandBuilder("<amount>")
-            .WithDescription("Withdraw a specific amount from Lethal Credit Union")
-            .WithMessage("Withdrawing [valueFor].\n\nYour new balance would be [newBalance]")
-            .EnableConfirmDeny(confirmMessage: "Withdrew [valueFor].\n\nYour balance: [bankBalance]")
-            .WithConditions("hasEnoughBalance")
-            .WithInputMatch(@"^(\d+)$")
-            .WithPreAction(input =>
-            {
-                _valueFor = Convert.ToInt32(input);
+        var totalScrapValue = ScrapUtils.GetShipSettledTotalRawScrapValue();
+        if (totalScrapValue < amount)
+        {
+            return new List<GrabbableObject>();
+        }
 
-                return true;
-            })
-            .WithAction(() =>
+        var nextScrapIndex = 0;
+        var allScrap = ScrapUtils.GetAllScrapInShip()
+            .Where(scrap => scrap.CanIncludeItem(Plugin.Instance.PluginConfig.BankIgnoreList))
+            .OrderByDescending(scrap => scrap.itemProperties.twoHanded)
+            .ThenByDescending(scrap => scrap.scrapValue)
+            .ToList();
+
+        var scrapToSell = new List<GrabbableObject>();
+
+        while (amount > 300) // arbitrary amount until it starts to specifically look for a perfect match, favouring 2handed scrap first
+        {
+            var nextScrap = allScrap[nextScrapIndex++];
+            scrapToSell.Add(nextScrap);
+            amount -= nextScrap.scrapValue;
+        }
+
+        // Time to actually be precise
+        allScrap = allScrap.Skip(nextScrapIndex)
+            .OrderBy(scrap => scrap.scrapValue)
+            .ToList();
+        nextScrapIndex = 0;
+
+        // When trying last few OR a very low amount, just see if it's less than the cheapest item in 'allScrap' list
+        if (amount < allScrap.Last().scrapValue)
+        {
+            scrapToSell.Add(allScrap.Last());
+            return scrapToSell;
+        }
+
+        while (amount > 0)
+        {
+            var scrapCombinations = new List<(GrabbableObject First, GrabbableObject Second)>();
+            for (var currentIndex = nextScrapIndex; currentIndex < allScrap.Count; currentIndex++)
             {
-                BankNetworkHandler.Instance.WithdrawServerRpc(_valueFor);
-            });
+                for (var nextIndex = currentIndex + 1; nextIndex < allScrap.Count; nextIndex++)
+                {
+                    scrapCombinations.Add((allScrap[currentIndex], allScrap[nextIndex]));
+                }
+            }
+
+            var matchingSumForAmountRemaining = scrapCombinations.FirstOrDefault(combo => combo.First.scrapValue + combo.Second.scrapValue >= amount);
+            if (matchingSumForAmountRemaining != default)
+            {
+                scrapToSell.Add(matchingSumForAmountRemaining.First);
+                scrapToSell.Add(matchingSumForAmountRemaining.Second);
+                return scrapToSell;
+            }
+
+            var nextScrap = allScrap[nextScrapIndex++];
+            scrapToSell.Add(nextScrap);
+            amount -= nextScrap.scrapValue;
+        }
+
+        return scrapToSell;
     }
 }

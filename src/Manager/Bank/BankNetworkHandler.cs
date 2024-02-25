@@ -68,7 +68,7 @@ internal class BankNetworkHandler : NetworkBehaviour
     {
         SaveManager.SaveData.BankBalance += depositValue;
 
-        HudUtils.DisplayNotification($"Lethal Credit Union balance has increased to {SaveManager.SaveData.BankBalance}");
+        HudUtils.DisplayNotification($"Lethal Credit Union balance has increased to ${SaveManager.SaveData.BankBalance}");
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -117,4 +117,13 @@ internal class BankNetworkHandler : NetworkBehaviour
 
         _logger.LogInfo($"Successfully synced values of {prop.itemProperties.itemName}");
     }
+
+    #region BETA Testing
+
+    [ClientRpc]
+    internal void SyncBankBalanceClientRpc(int amount)
+    {
+        SaveManager.SaveData.BankBalance = amount;
+    }
+    #endregion
 }

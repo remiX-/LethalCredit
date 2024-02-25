@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using UnityEngine;
+using static QualityCompany.Service.GameEvents;
 
 namespace LethalCredit.Manager.Saves;
 
@@ -9,12 +10,43 @@ internal class SaveManager
 {
     private static readonly ModLogger Logger = new(nameof(SaveManager));
 
-    internal static GameSaveData SaveData { get; private set; } = new();
+    internal static GameSaveData SaveData { get; private set; }
 
     private static bool IsHost => GameNetworkManager.Instance.isHostingGame;
 
     private static string _saveFileName;
     private static string _saveFilePath;
+
+    internal static void Init()
+    {
+        HudManagerStart += _ =>
+        {
+            Load();
+        };
+
+        Disconnected += _ =>
+        {
+            Save();
+
+            SaveData = null;
+        };
+
+        EndOfGame += instance =>
+        {
+            Logger.LogMessage($"StartOfRound.EndOfGame, allDead? {instance.allPlayersDead}");
+
+            if (!instance.allPlayersDead) return;
+
+            SaveData.BankBalance = 0;
+            Save();
+        };
+
+        PlayersFired += _ =>
+        {
+            SaveData.BankBalance = 0;
+            Save();
+        };
+    }
 
     internal static void Load()
     {

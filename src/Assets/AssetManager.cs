@@ -13,6 +13,7 @@ internal class AssetManager
     private static string _modRoot;
     private static readonly Dictionary<string, string> AssetPaths = new()
     {
+        { "NetworkHandler", "Assets/LethalCredit/Prefabs/ModNetworkHandler.prefab" },
         { "ATM", "Assets/LethalCredit/Prefabs/ATM.prefab" },
         { "CreditCard", "Assets/LethalCredit/Prefabs/CreditCardItem.asset" },
         { "DollarStack", "Assets/LethalCredit/Prefabs/DollarStackItem.asset" }

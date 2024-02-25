@@ -1,21 +1,22 @@
 using BepInEx;
 using BepInEx.Logging;
-using HarmonyLib;
 using LethalCredit.Assets;
 using LethalCredit.Manager.Saves;
+using LethalCredit.Network;
 using LethalLib.Extras;
 using LethalLib.Modules;
 using QualityCompany.Manager.ShipTerminal;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
-using static QualityCompany.Service.GameEvents;
 
 namespace LethalCredit;
 
 [BepInPlugin(PluginMetadata.PLUGIN_GUID, PluginMetadata.PLUGIN_NAME, PluginMetadata.PLUGIN_VERSION)]
+[BepInDependency("umno.QualityCompany", "1.4.0")]
+#if DEBUG
 [BepInDependency("evaisa.lethallib")]
-[BepInDependency("umno.QualityCompany")]
+#endif
 public class Plugin : BaseUnityPlugin
 {
     internal static Plugin Instance;
@@ -23,7 +24,7 @@ public class Plugin : BaseUnityPlugin
     internal PluginConfig PluginConfig;
     internal string PluginPath;
 
-    private readonly Harmony _harmony = new(PluginMetadata.PLUGIN_GUID);
+    // private readonly Harmony _harmony = new(PluginMetadata.PLUGIN_GUID);
 
     private void Awake()
     {
@@ -46,33 +47,6 @@ public class Plugin : BaseUnityPlugin
         Log.LogMessage($"Plugin {PluginMetadata.PLUGIN_NAME} v{PluginMetadata.PLUGIN_VERSION} is loaded!");
     }
 
-    private void Patch()
-    {
-        AdvancedTerminalRegistry.Register(Assembly.GetExecutingAssembly(), description: "Lethal Credit Union is great.");
-
-        _harmony.PatchAll(Assembly.GetExecutingAssembly());
-
-        HudManagerStart += _ =>
-        {
-            SaveManager.Load();
-        };
-
-        Disconnected += _ =>
-        {
-            SaveManager.Save();
-        };
-
-        EndOfGame += instance =>
-        {
-            Logger.LogMessage($"StartOfRound.EndOfGame, allDead? {instance.allPlayersDead}");
-
-            if (!instance.allPlayersDead) return;
-
-            SaveManager.SaveData.BankBalance = 0;
-            SaveManager.Save();
-        };
-    }
-
     private static void NetcodePatcher()
     {
         var types = Assembly.GetExecutingAssembly().GetTypes();
@@ -90,10 +64,25 @@ public class Plugin : BaseUnityPlugin
         }
     }
 
+    private void Patch()
+    {
+        AdvancedTerminalRegistry.Register(Assembly.GetExecutingAssembly(), commandName: "lcu", description: "Lethal Credit Union is great.");
+
+        // _harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+        ModNetworkManager.Init();
+        SaveManager.Init();
+    }
+
     private void LoadAssets()
     {
         AssetManager.LoadModBundle(PluginPath);
 
+        var ds = AssetManager.LoadBundleAsset<Item>("DollarStack");
+
+#if RELEASE
+        ModNetworkManager.RegisterNetworkPrefab(ds.spawnPrefab);
+#elif DEBUG
         var atmItem = AssetManager.LoadBundleAsset<GameObject>("ATM");
 
         NetworkPrefabs.RegisterNetworkPrefab(atmItem);
@@ -133,7 +122,6 @@ public class Plugin : BaseUnityPlugin
         Items.RegisterShopItem(cc, 25);
 
         // dollarstack
-        var ds = AssetManager.LoadBundleAsset<Item>("DollarStack");
         Utilities.FixMixerGroups(ds.spawnPrefab);
         NetworkPrefabs.RegisterNetworkPrefab(ds.spawnPrefab);
 
@@ -141,5 +129,6 @@ public class Plugin : BaseUnityPlugin
         dsinfoNode.clearPreviousText = true;
         dsinfoNode.displayText = "Money.\n\n";
         Items.RegisterShopItem(ds, 25);
+#endif
     }
 }

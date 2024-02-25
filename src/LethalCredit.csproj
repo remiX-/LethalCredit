@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<AssemblyName>LethalCredit</AssemblyName>
-		<Version>0.0.1</Version>
+		<Version>0.1.0</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -56,13 +56,6 @@
 			<HintPath>$(BepInExDirectory)\plugins\Um_no-QualityCompany\QualityCompany.dll</HintPath>
 		</Reference>
 	</ItemGroup>
-
-	<!-- Bundle copying -->
-	<!-- <ItemGroup> -->
-	<!-- 	<None Update="Assets\modnetworkhandlerbundle"> -->
-	<!-- 		<CopyToOutputDirectory>Always</CopyToOutputDirectory> -->
-	<!-- 	</None> -->
-	<!-- </ItemGroup> -->
 
 	<Target Name="NetcodePatch" AfterTargets="Build">
 		<Message Text="NetcodePatch task" Importance="High" />
