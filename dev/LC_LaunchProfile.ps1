@@ -46,15 +46,16 @@ function LoadConfig() {
     if (Test-Path $configFilePath) {
         # Read and return the configuration from the existing file as a JSON object
         return Get-Content $configFilePath | ConvertFrom-Json
-    } else {
+    }
+    else {
         # Define the default configuration settings
         $defaultConfig = @{
-            "exePath" = 'C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company.exe'
+            "exePath"          = 'C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company.exe'
             "profileDirectory" = "$($env:APPDATA)\r2modmanPlus-local\LethalCompany\profiles"
-            "monitor" = 0  # Default monitor index
-            "selectedProfile" = ""  # Default to no selected profile
-            "windowCount" = 1  # Default number of game windows to launch
-            "windowSize" = 1  # Default game window size (full size)
+            "monitor"          = 0  # Default monitor index
+            "selectedProfile"  = ""  # Default to no selected profile
+            "windowCount"      = 1  # Default number of game windows to launch
+            "windowSize"       = 1  # Default game window size (full size)
         }
         # Save the default configuration to a file and return it
         $defaultConfig | ConvertTo-Json | Set-Content $configFilePath
@@ -298,11 +299,14 @@ $arguments = PrepareGameLaunchArguments -Width $WindowWidth -Height $WindowHeigh
 
 # Launch the Game
 # ----------------
-foreach ($i in 1..$config.windowCount){
+foreach ($i in 1..$config.windowCount) {
     Write-Host "Starting game: $i"
     Start-Process $config.exePath -ArgumentList $arguments
-    Start-Sleep -Milliseconds 2000  # Brief pause between launches
+
+    if ($config.windowCount -gt 1) {
+        Start-Sleep -Milliseconds 3000  # Brief pause between launches
+    }
 }
 
 # Wait for user input before exiting the script
-Read-Host
+# Read-Host

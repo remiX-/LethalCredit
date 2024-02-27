@@ -1,0 +1,67 @@
+ManifestFileVersion: 0
+CRC: 3986393252
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 52a8f1d65560cacdeccff3e402e33601
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 7562db5a6c163e17de166de0dbb7c0f2
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 52a8f1d65560cacdeccff3e402e33601
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+- Class: 82
+  Script: {instanceID: 0}
+- Class: 83
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: df8a8ec1fb4e08d01a3bd16540b76614, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: c30496d6ae6d6f907456e10a94e01ec6, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3c36d0a92cbb1f26a39169ef0eae393a, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3d0cf24d2ccc3b7eab72048d0f57c437, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b2f79a42f90ce4aa636bf27289ebbb62, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 241
+  Script: {instanceID: 0}
+- Class: 243
+  Script: {instanceID: 0}
+- Class: 245
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: Assembly-CSharp
+  ClassName: Battery
+Assets:
+- Assets/LethalCredit/Prefabs/ModNetworkHandler.prefab
+- Assets/LethalCredit/Prefabs/ATM.prefab
+- Assets/LethalCredit/Prefabs/CreditCardItem.asset
+- Assets/LethalCredit/Prefabs/DollarStackItem.asset
+Dependencies: []

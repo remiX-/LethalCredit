@@ -66,7 +66,7 @@ public class Plugin : BaseUnityPlugin
 
     private void Patch()
     {
-        AdvancedTerminalRegistry.Register(Assembly.GetExecutingAssembly(), commandKeyword: "lcu", description: "Lethal Credit Union is great.");
+        AdvancedTerminalRegistry.Register(Assembly.GetExecutingAssembly(), commandKeyword: "lcu", description: "Lethal Credit Union Bank, here to bank your scrap.");
 
         _harmony.PatchAll(typeof(ModNetworkManager));
     }

@@ -11,6 +11,8 @@ internal class PluginConfig
     #region Bank
     public string BankIgnoreList { get; set; }
 
+    public bool AutoBankAtEndOfRound { get; set; }
+
     public bool AllowBankingCredits { get; set; }
 
     public int BankCreditsRatePercentage { get; set; }
@@ -26,12 +28,19 @@ internal class PluginConfig
 
     public void Bind(ConfigFile configFile)
     {
-        #region Terminal
+        #region Bank
         BankIgnoreList = configFile.Bind(
             "Bank",
             "Bank Ignore list",
             "shotgun,gunammo,gift",
             "[HOST] A comma separated list of items to ignore in the ship when depositing items to Lethal Credit Union. Does not have to be the exact name but at least a matching portion. e.g. 'trag' for 'tragedy'"
+        ).Value;
+
+        AutoBankAtEndOfRound = configFile.Bind(
+            "Bank",
+            "Auto bank scrap at end of round",
+            true,
+            "[HOST] Whether the bank will automatically deposit all your scrap after leaving a moon."
         ).Value;
 
         AllowBankingCredits = configFile.Bind(
@@ -61,6 +70,7 @@ internal class PluginConfig
 
     public void ApplyHostConfig(PluginConfig hostConfig)
     {
+        AutoBankAtEndOfRound = hostConfig.AutoBankAtEndOfRound;
         BankIgnoreList = hostConfig.BankIgnoreList;
         AllowBankingCredits = hostConfig.AllowBankingCredits;
         BankCreditsRatePercentage = hostConfig.BankCreditsRatePercentage;

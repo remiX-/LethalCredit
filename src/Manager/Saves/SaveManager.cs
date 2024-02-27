@@ -26,10 +26,10 @@ internal class SaveManager
 
         Disconnected += _ =>
         {
-            Save();
-
             SaveData = new();
         };
+
+        SaveGame += _ => Save();
 
         EndOfGame += instance =>
         {

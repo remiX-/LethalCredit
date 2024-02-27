@@ -63,7 +63,7 @@
 		<Exec Command="netcode-patch &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')" />
 	</Target>
 
-	<Target Name="Copy To Dist" AfterTargets="NetcodePatch" Condition="'$(Configuration)' == 'Release'">
+	<Target Name="Release" AfterTargets="NetcodePatch" Condition="'$(Configuration)' == 'Release'">
 		<Message Text="Configured for release, running release script." Importance="High" />
 
 		<Exec Command="powershell $(SolutionDir)release.ps1" />

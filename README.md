@@ -22,8 +22,13 @@ Check up on your balance at your local LCU bank.
 
 # Future plans
 
-* Add an ATM ship upgrade - requires a credit card
-* Add a credit card item - not scrap but required to access the ATM
+- Add an ATM ship upgrade - requires a credit card
+- Add a credit card item - not scrap but required to access the ATM
 
 # TO FIX
-* Depositing always spawns monies under host
+
+- Depositing always spawns monies under host
+- Terminal commands clashing
+- save scum: deposit -> go to map -> exit/dc game
+- leaving Company Building tries to AutoBank
+- sell all at Company Building failing??
