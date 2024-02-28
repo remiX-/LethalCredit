@@ -27,7 +27,7 @@ internal class Command2Deposit
             .AddTextReplacement("[newBalance]", () => $"${SaveManager.SaveData.BankBalance - _valueFor}")
             .AddTextReplacement("[bankBalance]", () => $"${SaveManager.SaveData.BankBalance}")
             .AddTextReplacement("[shipActualTotal]", () => $"${ScrapUtils.GetShipTotalIncludedScrapValue(Plugin.Instance.PluginConfig.BankIgnoreList)}")
-            .WithCondition("d_hasScrapItems", "You do not own any scrap.",
+            .WithCondition("d_hasScrapItems", "You do not have any scrap available to for deposit.",
                 () => ScrapUtils.GetAllIncludedScrapInShip(Plugin.Instance.PluginConfig.BankIgnoreList).Count > 0)
             .WithCondition("depositMoreThanZero", "Do you really think you can deposit nothing?", () => _valueFor > 0)
             .WithCondition("notEnoughScrap",
@@ -93,7 +93,7 @@ internal class Command2Deposit
 
     private static IEnumerable<GrabbableObject> GetScrapForDeposit(int amount)
     {
-        var totalScrapValue = ScrapUtils.GetShipSettledTotalRawScrapValue();
+        var totalScrapValue = ScrapUtils.GetShipTotalIncludedScrapValue(Plugin.Instance.PluginConfig.BankIgnoreList);
         if (totalScrapValue < amount)
         {
             return new List<GrabbableObject>();
