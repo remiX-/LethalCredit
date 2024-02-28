@@ -19,10 +19,7 @@ internal class SaveManager
 
     internal static void Init()
     {
-        HudManagerStart += _ =>
-        {
-            Load();
-        };
+        Load();
 
         Disconnected += _ =>
         {
@@ -53,19 +50,19 @@ internal class SaveManager
         if (!IsHost) return;
 
         var saveNum = GameNetworkManager.Instance.saveFileNum;
-        Logger.LogDebug($"HOST: using save data file in slot number {saveNum}");
+        Logger.TryLogDebug($"HOST: using save data file in slot number {saveNum}");
         _saveFileName = $"{PluginMetadata.PLUGIN_NAME}_{saveNum}.json";
         _saveFilePath = Path.Combine(Application.persistentDataPath, _saveFileName);
 
         if (File.Exists(_saveFilePath))
         {
-            Logger.LogDebug($"Loading save file: {_saveFileName}");
+            Logger.TryLogDebug($"Loading save file: {_saveFileName}");
             var json = File.ReadAllText(_saveFilePath);
             LoadSaveJson(json);
         }
         else
         {
-            Logger.LogDebug($"No save file found: {_saveFileName}, creating new");
+            Logger.TryLogDebug($"No save file found: {_saveFileName}, creating new");
             SaveData = new GameSaveData();
             Save();
         }
@@ -78,17 +75,17 @@ internal class SaveManager
     {
         if (!IsHost) return;
 
-        Logger.LogDebug($"Saving save data to {_saveFileName}");
+        Logger.TryLogDebug($"Saving save data to {_saveFileName}");
         var json = JsonConvert.SerializeObject(SaveData);
         File.WriteAllText(_saveFilePath, json);
     }
 
     internal static void ClientLoadFromString(string saveJson)
     {
-        Logger.LogDebug("CLIENT: Save file received from host, updating.");
+        Logger.TryLogDebug("CLIENT: Save file received from host, updating.");
         LoadSaveJson(saveJson);
 
-        Logger.LogDebug(JsonConvert.SerializeObject(SaveData));
+        Logger.TryLogDebug(JsonConvert.SerializeObject(SaveData));
         Plugin.Instance.PluginConfig.DebugPrintConfig(Logger);
     }
 

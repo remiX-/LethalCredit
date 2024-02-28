@@ -28,7 +28,7 @@ internal class Command3Withdraw
             .AddTextReplacement("[numScrapDeposited]", () => _recommendedScraps.Count)
             .AddTextReplacement("[newBalance]", () => $"${_newBalance}")
             .AddTextReplacement("[bankBalance]", () => $"${SaveManager.SaveData.BankBalance}")
-            .WithCondition("hasEnoughBalance", "You do not have enough moneh, current balance: [bankBalance]. git gud", () => SaveManager.SaveData.BankBalance >= _valueFor);
+            .WithCondition("hasEnoughBalance", "You do not have enough money in the bank.\n\nCurrent balance: [bankBalance].", () => SaveManager.SaveData.BankBalance >= _valueFor);
 
         static string GenerateDepositScrapComboText()
         {
@@ -43,7 +43,7 @@ internal class Command3Withdraw
     private static TerminalSubCommandBuilder CreateWithdrawAllCommand()
     {
         return new TerminalSubCommandBuilder("all")
-            .WithDescription("Withdraw current quota")
+            .WithDescription("Withdraw all LCU bucks")
             .WithMessage("Withdrawing [valueFor].\n\nYour new balance would be [newBalance]")
             .EnableConfirmDeny(confirmMessage: "Withdrew [valueFor].\n\nYour balance: [newBalance]")
             .WithConditions("hasEnoughBalance")
@@ -61,7 +61,7 @@ internal class Command3Withdraw
     private static TerminalSubCommandBuilder CreateWithdrawQuotaCommand()
     {
         return new TerminalSubCommandBuilder("quota")
-            .WithDescription("Withdraw current quota")
+            .WithDescription("Withdraw LCU bucks equivalent to current quota")
             .WithMessage("Withdrawing [valueFor].\n\nYour new balance would be [newBalance]")
             .EnableConfirmDeny(confirmMessage: "Withdrew [valueFor].\n\nYour balance: [newBalance]")
             .WithConditions("hasEnoughBalance")
@@ -79,7 +79,7 @@ internal class Command3Withdraw
     private static TerminalSubCommandBuilder CreateWithdrawSubCommand()
     {
         return new TerminalSubCommandBuilder("<amount>")
-            .WithDescription("Withdraw a specific amount")
+            .WithDescription("Withdraw a specific amount of LCU bucks")
             .WithMessage("Withdrawing [valueFor].\n\nYour new balance would be [newBalance]")
             .EnableConfirmDeny(confirmMessage: "Withdrew [valueFor].\n\nYour balance: [newBalance]")
             .WithConditions("hasEnoughBalance")

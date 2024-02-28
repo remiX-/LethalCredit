@@ -69,8 +69,8 @@ MonoBehaviour:
   maxRange: 13
   minRange: 1
   requiresLineOfSight: 1
-  headerText: Monies
-  subText: TODO
+  headerText: LCU Bucks
+  subText: Where did this come from?
   scrapValue: 0
   creatureScanID: -1
   nodeType: 2
@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 2526951532437571846}
   - component: {fileID: 8817483327653295504}
   m_Layer: 6
-  m_Name: DollarStack
+  m_Name: LCUBucks
   m_TagString: PhysicsProp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -7,7 +7,7 @@ using Unity.Netcode;
 
 namespace LethalCredit.Commands;
 
-internal class Command4Force
+internal class Command5Force
 {
     private static int _value;
 
@@ -37,7 +37,6 @@ internal class Command4Force
                 if (_value < 0) _value = 0;
 
                 BankNetworkHandler.Instance.SyncBankBalanceClientRpc(_value);
-                HudUtils.DisplayNotification($"The host has forced LCU Bank balance to ${_value}");
 
                 return true;
             })

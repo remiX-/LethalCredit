@@ -1,4 +1,5 @@
-﻿using BepInEx.Configuration;
+﻿using BepInEx;
+using BepInEx.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
@@ -9,7 +10,7 @@ namespace LethalCredit;
 internal class PluginConfig
 {
     #region Bank
-    public string BankIgnoreList { get; set; }
+    public string BankIgnoreList { get; set; } = "";
 
     public bool AutoBankAtEndOfRound { get; set; }
 
@@ -23,10 +24,7 @@ internal class PluginConfig
     public bool ShowDebugLogs { get; set; }
     #endregion
 
-    public PluginConfig()
-    { }
-
-    public void Bind(ConfigFile configFile)
+    internal void Bind(ConfigFile configFile)
     {
         #region Bank
         BankIgnoreList = configFile.Bind(
@@ -66,9 +64,17 @@ internal class PluginConfig
             "[CLIENT] Turn on/off debug logs."
         ).Value;
         #endregion
+
+        VerifyConfig();
     }
 
-    public void ApplyHostConfig(PluginConfig hostConfig)
+    private void VerifyConfig()
+    {
+        BankIgnoreList = BankIgnoreList.IsNullOrWhiteSpace() ? "shotgun,gunammo,gift" : BankIgnoreList;
+        BankCreditsRatePercentage = Math.Clamp(BankCreditsRatePercentage, 10, 100);
+    }
+
+    internal void ApplyHostConfig(PluginConfig hostConfig)
     {
         AutoBankAtEndOfRound = hostConfig.AutoBankAtEndOfRound;
         BankIgnoreList = hostConfig.BankIgnoreList;
@@ -76,7 +82,7 @@ internal class PluginConfig
         BankCreditsRatePercentage = hostConfig.BankCreditsRatePercentage;
     }
 
-    public void DebugPrintConfig(ModLogger logger)
+    internal void DebugPrintConfig(ModLogger logger)
     {
         foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(this))
         {

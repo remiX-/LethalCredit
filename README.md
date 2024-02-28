@@ -27,8 +27,4 @@ Check up on your balance at your local LCU bank.
 
 # TO FIX
 
-- Depositing always spawns monies under host
-- Terminal commands clashing
 - save scum: deposit -> go to map -> exit/dc game
-- leaving Company Building tries to AutoBank
-- sell all at Company Building failing??

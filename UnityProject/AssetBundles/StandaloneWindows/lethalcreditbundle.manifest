@@ -1,15 +1,15 @@
 ManifestFileVersion: 0
-CRC: 3986393252
+CRC: 1458413800
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 52a8f1d65560cacdeccff3e402e33601
+    Hash: b0f544018cc030adc9fc6ed4098875fc
   TypeTreeHash:
     serializedVersion: 2
     Hash: 7562db5a6c163e17de166de0dbb7c0f2
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 52a8f1d65560cacdeccff3e402e33601
+    Hash: b0f544018cc030adc9fc6ed4098875fc
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -62,6 +62,6 @@ SerializeReferenceClassIdentifiers:
 Assets:
 - Assets/LethalCredit/Prefabs/ModNetworkHandler.prefab
 - Assets/LethalCredit/Prefabs/ATM.prefab
-- Assets/LethalCredit/Prefabs/CreditCardItem.asset
-- Assets/LethalCredit/Prefabs/DollarStackItem.asset
+- Assets/LethalCredit/Prefabs/LCUCreditCard.asset
+- Assets/LethalCredit/Prefabs/LCUBucks.asset
 Dependencies: []

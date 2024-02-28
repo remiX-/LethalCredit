@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 3225591910820625033}
   - component: {fileID: 4736337729530019689}
   m_Layer: 6
-  m_Name: CreditCard
+  m_Name: LCUCreditCard
   m_TagString: PhysicsProp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
