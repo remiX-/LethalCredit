@@ -677,7 +677,7 @@ PrefabInstance:
     - target: {fileID: 2910697900874394859, guid: 4e24f03b8853ed84e9a0120a0d1ba17c,
         type: 3}
       propertyPath: m_Name
-      value: DollarStack
+      value: LCUBucks
       objectReference: {fileID: 0}
     - target: {fileID: 3650640657718388875, guid: 4e24f03b8853ed84e9a0120a0d1ba17c,
         type: 3}

@@ -1,10 +1,12 @@
-﻿using LethalCredit.Assets;
+﻿using GameNetcodeStuff;
+using LethalCredit.Assets;
 using LethalCredit.Manager.Saves;
 using Newtonsoft.Json;
 using QualityCompany.Utils;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using static QualityCompany.Service.GameEvents;
 
 namespace LethalCredit.Manager.Bank;
 
@@ -12,25 +14,62 @@ internal class BankNetworkHandler : NetworkBehaviour
 {
     public static BankNetworkHandler Instance { get; private set; }
 
-    private readonly ModLogger _logger = new(nameof(BankNetworkHandler));
+    private readonly ModLogger Logger = new(nameof(BankNetworkHandler));
 
-    // private bool _retrievedPluginConfig;
+    private bool _retrievedPluginConfig;
     private bool _retrievedSaveFile;
 
     private void Start()
     {
         Instance = this;
 
-        if (IsHost) return;
+        if (IsHost)
+        {
+            SaveGame += AutobankScrap;
 
-        _logger.LogDebug("CLIENT: Requesting hosts config...");
+            return;
+        }
+
+        Logger.TryLogDebug("CLIENT: Requesting hosts config...");
+        RequestPluginConfigServerRpc();
         RequestSaveDataServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestPluginConfigServerRpc()
+    {
+        Logger.TryLogDebug("HOST: A client is requesting plugin config");
+        var json = JsonConvert.SerializeObject(Plugin.Instance.PluginConfig);
+        SendPluginConfigClientRpc(json);
+    }
+
+    [ClientRpc]
+    private void SendPluginConfigClientRpc(string json)
+    {
+        if (IsHost || IsServer) return;
+
+        if (_retrievedPluginConfig)
+        {
+            Logger.TryLogDebug("CLIENT: Config has already been received from host, disregarding.");
+            return;
+        }
+        _retrievedPluginConfig = true;
+
+        var cfg = JsonConvert.DeserializeObject<PluginConfig>(json);
+        if (cfg is null)
+        {
+            Logger.LogError($"CLIENT: failed to deserialize plugin config from host, disregarding. raw json: {json}");
+            return;
+        }
+
+        Logger.TryLogDebug("Config received, deserializing and constructing...");
+        Plugin.Instance.PluginConfig.ApplyHostConfig(cfg);
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void RequestSaveDataServerRpc()
     {
-        _logger.LogDebug("HOST: A client is requesting save data");
+        Logger.TryLogDebug("HOST: A client is requesting save data");
         var json = JsonConvert.SerializeObject(SaveManager.SaveData);
         SendSaveDataClientRpc(json);
     }
@@ -64,44 +103,49 @@ internal class BankNetworkHandler : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void DepositClientRpc(int depositValue)
+    private void DepositClientRpc(int depositValue)
     {
         SaveManager.SaveData.BankBalance += depositValue;
 
-        HudUtils.DisplayNotification($"Lethal Credit Union balance has increased to ${SaveManager.SaveData.BankBalance}");
+        HudUtils.DisplayNotification($"LCU balance has increased to ${SaveManager.SaveData.BankBalance}");
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void WithdrawServerRpc(int amount)
+    internal void WithdrawServerRpc(int amount, ulong playerClientId)
     {
-        var dollarStackItem = (Item)AssetManager.AssetCache["DollarStack"];
-        var prefab = dollarStackItem.spawnPrefab;
+        var lcuBucks = (Item)AssetManager.AssetCache["LCUBucks"];
+        var lcuBucksSpawnPrefab = lcuBucks.spawnPrefab;
 
-        var currentPlayerLocation = GameNetworkManager.Instance.localPlayerController.transform.position;
-        var dollarStackScrap = Instantiate(prefab, currentPlayerLocation, Quaternion.identity);
-        var itemGrabObj = dollarStackScrap.GetComponent<GrabbableObject>();
-
-        if (itemGrabObj is null)
+        var player = GameUtils.StartOfRound.allPlayerScripts.FirstOrDefault(script => script.playerClientId == playerClientId);
+        if (player is null)
         {
-            _logger.LogFatal($"{dollarStackScrap.name}: did not have a GrabbableObject component");
+            Logger.LogFatal($"Tried to execute withdraw with an unknown player script with playerClientId {playerClientId}");
             return;
         }
 
-        _logger.LogDebug($" > spawned in {dollarStackScrap.name} for {amount}");
-        dollarStackScrap.GetComponent<NetworkObject>().Spawn();
+        var lcuBucksGameObject = Instantiate(lcuBucksSpawnPrefab, player.transform.position, Quaternion.identity);
+        var itemGrabObj = lcuBucksGameObject.GetComponent<GrabbableObject>();
 
-        SyncValuesClientRpc(amount, new NetworkBehaviourReference(itemGrabObj));
+        if (itemGrabObj is null)
+        {
+            Logger.LogFatal($"{lcuBucksGameObject.name}: did not have a GrabbableObject component");
+            return;
+        }
+
+        Logger.TryLogDebug($" > spawned in {lcuBucksGameObject.name} for {amount}");
+        lcuBucksGameObject.GetComponent<NetworkObject>().Spawn();
+
+        WithdrawClientRpc(amount, player.playerUsername, new NetworkBehaviourReference(itemGrabObj));
     }
 
     [ClientRpc]
-    public void SyncValuesClientRpc(int amount, NetworkBehaviourReference netRef)
+    private void WithdrawClientRpc(int amount, string username, NetworkBehaviourReference netRef)
     {
-        _logger.LogMessage("SyncValuesClientRpc");
         netRef.TryGet(out GrabbableObject prop);
 
         if (prop is null)
         {
-            _logger.LogFatal("Unable to resolve net ref for SyncValuesClientRpc!");
+            Logger.LogFatal("Unable to resolve net ref for WithdrawClientRpc!");
             return;
         }
 
@@ -115,7 +159,88 @@ internal class BankNetworkHandler : NetworkBehaviour
 
         SaveManager.SaveData.BankBalance -= amount;
 
-        _logger.LogInfo($"Successfully synced values of {prop.itemProperties.itemName}");
+        HudUtils.DisplayNotification($"LCU: {username} has withdrawn ${amount}! Balance: ${SaveManager.SaveData.BankBalance}");
+
+        Logger.TryLogDebug($"Successfully synced values of {prop.itemProperties.itemName}");
+    }
+
+    private void AutobankScrap(GameNetworkManager instance)
+    {
+        if (!Plugin.Instance.PluginConfig.AutoBankAtEndOfRound)
+        {
+            Logger.LogDebug("Autobank is disabled, skipping");
+            return;
+        }
+
+        Logger.TryLogDebug($"On moon: {GameUtils.CurrentPlanet()} | {GameUtils.CurrentLevel()} | {GameUtils.IsOnCompany()} | isDC? {instance.isDisconnecting}");
+        if (instance.isDisconnecting) return;
+
+        if (GameUtils.IsOnCompany())
+        {
+            Logger.TryLogDebug("On the company, will not autobank");
+            return;
+        }
+
+        var scrapToBank = ScrapUtils.GetAllIncludedScrapInShip(Plugin.Instance.PluginConfig.BankIgnoreList);
+        if (!scrapToBank.Any())
+        {
+            Logger.LogDebug("No items to autobank on round ended.");
+            return;
+        }
+
+        var totalValue = 0;
+        Logger.LogDebug("Autobank starting...");
+
+        foreach (var go in scrapToBank)
+        {
+            Logger.LogDebug($" > {go.name} for {go.scrapValue}");
+            var networkObject = go.GetComponent<NetworkObject>();
+            if (networkObject is null)
+            {
+                Logger.LogError("  > is null, ignoring");
+                continue;
+            }
+            if (!networkObject.IsSpawned)
+            {
+                Logger.LogError("  > is NOT spawned?? ignoring");
+                continue;
+            }
+
+            networkObject.Despawn();
+
+            totalValue += go.scrapValue;
+        }
+        Logger.LogDebug($"Autobank complete! Banked {scrapToBank.Count} scrap for a total of {totalValue}");
+
+        AutobankClientRpc(scrapToBank.Count, totalValue);
+
+        SaveManager.Save();
+    }
+
+    [ClientRpc]
+    private void AutobankClientRpc(int depositCount, int depositValue)
+    {
+        var oldBalance = SaveManager.SaveData.BankBalance;
+        SaveManager.SaveData.BankBalance += depositValue;
+        Logger.TryLogDebug($"Autobank: balance increased from {oldBalance} to {SaveManager.SaveData.BankBalance}");
+
+        HudUtils.DisplayNotification($"LCU has auto-banked {depositCount} scrap items. Balance: ${SaveManager.SaveData.BankBalance}");
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void BankCreditsServerRpc(int amount)
+    {
+        BankCreditsClientRpc(amount, BankUtils.GetBankAmountForCredits(amount));
+    }
+
+    [ClientRpc]
+    private void BankCreditsClientRpc(int amount, int bankedAmount)
+    {
+        Logger.LogDebug($"Banking {amount} credits for {bankedAmount} LCU bucks");
+        SaveManager.SaveData.BankBalance += bankedAmount;
+        GameUtils.Terminal.groupCredits -= amount;
+
+        HudUtils.DisplayNotification($"LCU has banked ${amount} credits. Balance: ${SaveManager.SaveData.BankBalance}");
     }
 
     #region BETA Testing
@@ -124,6 +249,8 @@ internal class BankNetworkHandler : NetworkBehaviour
     internal void SyncBankBalanceClientRpc(int amount)
     {
         SaveManager.SaveData.BankBalance = amount;
+
+        HudUtils.DisplayNotification($"LCU: The host has forced bank balance to ${amount}");
     }
     #endregion
 }

@@ -1,7 +1,5 @@
-﻿using HarmonyLib;
-using LethalCredit.Assets;
+﻿using LethalCredit.Assets;
 using LethalCredit.Manager.Bank;
-using LethalCredit.Manager.Saves;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,19 +9,18 @@ namespace LethalCredit.Network;
 
 internal class ModNetworkManager
 {
-    private static GameObject _networkPrefab;
-    private static bool _hasInit;
+    private static GameObject? _networkPrefab;
     private static readonly List<GameObject> _networkPrefabs = new ();
 
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(GameNetworkManager), "Start")]
-    public static void Start()
+    internal static void Init()
+    {
+        GameNetworkManagerStart += _ => Start();
+        StartOfRoundAwake += _ => Load();
+    }
+
+    private static void Start()
     {
         Plugin.Instance.Log.LogMessage("GameNetworkManager.Start");
-        SaveManager.Init();
-        if (_networkPrefab is not null || _hasInit) return;
-
-        _hasInit = true;
 
         _networkPrefab = AssetManager.LoadBundleAsset<GameObject>("NetworkHandler");
         _networkPrefab.AddComponent<BankNetworkHandler>();
@@ -33,15 +30,13 @@ internal class ModNetworkManager
 
         foreach (var prefab in _networkPrefabs)
         {
-            if (NetworkManager.Singleton.NetworkConfig.Prefabs.Contains(prefab)) return;
+            if (NetworkManager.Singleton.NetworkConfig.Prefabs.Contains(prefab)) continue;
 
             NetworkManager.Singleton.AddNetworkPrefab(prefab);
         }
     }
 
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(StartOfRound), "Awake")]
-    public static void AwakePatch(StartOfRound __instance)
+    private static void Load()
     {
         Plugin.Instance.Log.LogMessage("StartOfRound.Awake");
         if (!NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsServer) return;

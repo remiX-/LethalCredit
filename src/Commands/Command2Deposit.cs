@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace LethalCredit.Commands;
 
-internal class DepositCommand
+internal class Command2Deposit
 {
     private static List<GrabbableObject> _recommendedScraps = new();
     private static int _valueFor;
@@ -16,22 +16,22 @@ internal class DepositCommand
     [TerminalCommand]
     private static TerminalCommandBuilder Deposit()
     {
-        return new TerminalCommandBuilder("lcu deposit")
-            .WithDescription("Let LCU take some scrap for you")
+        return new TerminalCommandBuilder("lcu-deposit")
+            .WithHelpDescription("Let LCU gobble up your scrap to a safe place")
             .WithSubCommand(CreateDepositAllCommand())
             .WithSubCommand(CreateDepositSubCommand())
-            .AddTextReplacement("[d_valueFor]", () => $"${_valueFor}")
+            .AddTextReplacement("[valueFor]", () => $"${_valueFor}")
             .AddTextReplacement("[depositActualTotal]", () => $"${_recommendedScraps.ScrapValueOfCollection()}")
             .AddTextReplacement("[depositScrapCombo]", GenerateDepositScrapComboText)
             .AddTextReplacement("[numScrapDeposited]", () => _recommendedScraps.Count)
-            .AddTextReplacement("[d_newBalance]", () => $"${SaveManager.SaveData.BankBalance - _valueFor}")
-            .AddTextReplacement("[d_bankBalance]", () => $"${SaveManager.SaveData.BankBalance}")
-            .AddTextReplacement("[d_shipActualTotal]", () => $"${ScrapUtils.GetShipTotalIncludedScrapValue(Plugin.Instance.PluginConfig.BankIgnoreList)}")
-            .WithCondition("d_hasScrapItems", "You do not own any scrap.",
+            .AddTextReplacement("[newBalance]", () => $"${SaveManager.SaveData.BankBalance - _valueFor}")
+            .AddTextReplacement("[bankBalance]", () => $"${SaveManager.SaveData.BankBalance}")
+            .AddTextReplacement("[shipActualTotal]", () => $"${ScrapUtils.GetShipTotalIncludedScrapValue(Plugin.Instance.PluginConfig.BankIgnoreList)}")
+            .WithCondition("d_hasScrapItems", "You do not have any scrap available to for deposit.",
                 () => ScrapUtils.GetAllIncludedScrapInShip(Plugin.Instance.PluginConfig.BankIgnoreList).Count > 0)
             .WithCondition("depositMoreThanZero", "Do you really think you can deposit nothing?", () => _valueFor > 0)
             .WithCondition("notEnoughScrap",
-                "LCU is not happy with this. You do not enough scrap to deposit [d_valueFor].\n\nYour currently have a total of [d_shipActualTotal].",
+                "LCU is not happy with this. You do not enough scrap to deposit [valueFor].\n\nYour currently have a total of [shipActualTotal].",
                 () => _valueFor < ScrapUtils.GetShipTotalIncludedScrapValue(Plugin.Instance.PluginConfig.BankIgnoreList));
 
         static string GenerateDepositScrapComboText()
@@ -46,7 +46,7 @@ internal class DepositCommand
 
     private static TerminalSubCommandBuilder CreateDepositAllCommand()
     {
-        return new TerminalSubCommandBuilder("depall")
+        return new TerminalSubCommandBuilder("all")
             .WithDescription("Deposit all available scrap in the ship.")
             .WithMessage("Requesting to deposit ALL scrap.\n\nLethal Credit Union will accept the following items for a total of [depositActualTotal]:\n[depositScrapCombo]")
             .EnableConfirmDeny(confirmMessage: "Deposited [numScrapDeposited] scrap items for [depositActualTotal].")
@@ -66,7 +66,7 @@ internal class DepositCommand
     {
         return new TerminalSubCommandBuilder("<deposit_amount>")
             .WithDescription("Deposit as close as possible to input amount")
-            .WithMessage("Requesting to deposit value close to [d_valueFor].\n\nLethal Credit Union will accept the following items for a total of [depositActualTotal]:\n[depositScrapCombo]")
+            .WithMessage("Requesting to deposit value close to [valueFor].\n\nLethal Credit Union will accept the following items for a total of [depositActualTotal]:\n[depositScrapCombo]")
             .EnableConfirmDeny(confirmMessage: "Deposited [numScrapDeposited] scrap items for [depositActualTotal].")
             .WithConditions("d_hasScrapItems", "notEnoughScrap")
             .WithInputMatch(@"^(\d+)$")
@@ -93,7 +93,7 @@ internal class DepositCommand
 
     private static IEnumerable<GrabbableObject> GetScrapForDeposit(int amount)
     {
-        var totalScrapValue = ScrapUtils.GetShipSettledTotalRawScrapValue();
+        var totalScrapValue = ScrapUtils.GetShipTotalIncludedScrapValue(Plugin.Instance.PluginConfig.BankIgnoreList);
         if (totalScrapValue < amount)
         {
             return new List<GrabbableObject>();

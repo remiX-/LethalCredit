@@ -15,8 +15,8 @@ internal class AssetManager
     {
         { "NetworkHandler", "Assets/LethalCredit/Prefabs/ModNetworkHandler.prefab" },
         { "ATM", "Assets/LethalCredit/Prefabs/ATM.prefab" },
-        { "CreditCard", "Assets/LethalCredit/Prefabs/CreditCardItem.asset" },
-        { "DollarStack", "Assets/LethalCredit/Prefabs/DollarStackItem.asset" }
+        { "LCUCreditCard", "Assets/LethalCredit/Prefabs/LCUCreditCard.asset" },
+        { "LCUBucks", "Assets/LethalCredit/Prefabs/LCUBucks.asset" }
     };
     internal static readonly Dictionary<string, GameObject> Prefabs = new();
 
@@ -57,7 +57,7 @@ internal class AssetManager
             return null;
         }
 
-        Logger.LogDebug($"Loaded asset located in {path}");
+        Logger.TryLogDebug($"Loaded asset located in {path}");
         return result;
     }
 

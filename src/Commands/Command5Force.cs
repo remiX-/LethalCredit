@@ -1,21 +1,23 @@
 ﻿using LethalCredit.Manager.Bank;
 using LethalCredit.Manager.Saves;
 using QualityCompany.Manager.ShipTerminal;
+using QualityCompany.Utils;
 using System;
 using Unity.Netcode;
 
 namespace LethalCredit.Commands;
 
-internal class ForceCommand
+internal class Command5Force
 {
     private static int _value;
 
     [TerminalCommand]
     private static TerminalCommandBuilder Force()
     {
-        return new TerminalCommandBuilder("lcu force")
+        return new TerminalCommandBuilder("lcu-force")
+            .WithHelpDescription("Force update LCU's bank balance. Note: This should be used for beta testing purposes and it is limited to the host.")
             .WithSubCommand(CreateSubCommand())
-            .AddTextReplacement("[f_bankBalance]", () => $"${SaveManager.SaveData.BankBalance}")
+            .AddTextReplacement("[bankBalance]", () => $"${SaveManager.SaveData.BankBalance}")
             .WithCondition("isHost", "You are not host.", () => NetworkManager.Singleton.IsHost);
     }
 
@@ -23,15 +25,19 @@ internal class ForceCommand
     {
         return new TerminalSubCommandBuilder("<amount>")
             .WithDescription("BETA TESTING PURPOSES ONLY\n\nForce the bank to have a specific amount.")
-            .WithMessage("Your new balance: [f_bankBalance]")
+            .WithMessage("Your new balance: [bankBalance]")
+            .WithConditions("isHost")
             .WithInputMatch(@"^(\d+)$")
             .WithPreAction(input =>
             {
+                if (!NetworkManager.Singleton.IsHost) return false;
+
                 _value = Convert.ToInt32(input);
 
-                if (_value <= 0) return false;
+                if (_value < 0) _value = 0;
 
                 BankNetworkHandler.Instance.SyncBankBalanceClientRpc(_value);
+
                 return true;
             })
             .WithAction(() =>

@@ -1,14 +1,16 @@
 using BepInEx;
 using BepInEx.Logging;
-using HarmonyLib;
 using LethalCredit.Assets;
+using LethalCredit.Manager.Saves;
 using LethalCredit.Network;
-using LethalLib.Extras;
-using LethalLib.Modules;
 using QualityCompany.Manager.ShipTerminal;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
+#if DEBUG
+using LethalLib.Extras;
+using LethalLib.Modules;
+#endif
 
 namespace LethalCredit;
 
@@ -19,12 +21,11 @@ namespace LethalCredit;
 #endif
 public class Plugin : BaseUnityPlugin
 {
-    internal static Plugin Instance;
-    internal ManualLogSource Log;
-    internal PluginConfig PluginConfig;
-    internal string PluginPath;
+    internal static Plugin Instance = null!;
 
-    private readonly Harmony _harmony = new(PluginMetadata.PLUGIN_GUID);
+    internal ManualLogSource Log = null!;
+    internal PluginConfig PluginConfig = null!;
+    internal string PluginPath = null!;
 
     private void Awake()
     {
@@ -66,16 +67,21 @@ public class Plugin : BaseUnityPlugin
 
     private void Patch()
     {
-        AdvancedTerminalRegistry.Register(Assembly.GetExecutingAssembly(), commandKeyword: "lcu", description: "Lethal Credit Union is great.");
+        AdvancedTerminalRegistry.Register(Assembly.GetExecutingAssembly(), commandKeyword: "lcu", description: "Lethal Credit Union Bank, here to bank your scrap.");
 
-        _harmony.PatchAll(typeof(ModNetworkManager));
+        ModNetworkManager.Init();
+        QualityCompany.Service.GameEvents.StartOfRoundStart += _ =>
+        {
+            Log.LogMessage("Registered to StartOfRoundStart");
+            SaveManager.Init();
+        };
     }
 
     private void LoadAssets()
     {
         AssetManager.LoadModBundle(PluginPath);
 
-        var ds = AssetManager.LoadBundleAsset<Item>("DollarStack");
+        var ds = AssetManager.LoadBundleAsset<Item>("LCUBucks");
 
 #if RELEASE
         ModNetworkManager.RegisterNetworkPrefab(ds.spawnPrefab);
@@ -118,7 +124,7 @@ public class Plugin : BaseUnityPlugin
         infoNode.displayText = "A credit card?!\n\n";
         Items.RegisterShopItem(cc, 25);
 
-        // dollarstack
+        // lcubucks
         Utilities.FixMixerGroups(ds.spawnPrefab);
         NetworkPrefabs.RegisterNetworkPrefab(ds.spawnPrefab);
 

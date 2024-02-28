@@ -8,6 +8,7 @@
 		<LangVersion>latest</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<Import Project="CommonBuildProperties.proj" />
@@ -52,7 +53,7 @@
 		<Reference Include="LethalLib">
 			<HintPath>$(BepInExDirectory)\plugins\Evaisa-LethalLib\LethalLib\LethalLib.dll</HintPath>
 		</Reference>
-		<Reference Include="LethalLib">
+		<Reference Include="QualityCompany">
 			<HintPath>$(BepInExDirectory)\plugins\Um_no-QualityCompany\QualityCompany.dll</HintPath>
 		</Reference>
 	</ItemGroup>
@@ -63,7 +64,7 @@
 		<Exec Command="netcode-patch &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')" />
 	</Target>
 
-	<Target Name="Copy To Dist" AfterTargets="NetcodePatch" Condition="'$(Configuration)' == 'Release'">
+	<Target Name="Release" AfterTargets="NetcodePatch" Condition="'$(Configuration)' == 'Release'">
 		<Message Text="Configured for release, running release script." Importance="High" />
 
 		<Exec Command="powershell $(SolutionDir)release.ps1" />
