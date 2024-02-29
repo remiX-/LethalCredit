@@ -8,23 +8,41 @@ Got Scrap? We'll take it!
 
 # Features
 
-## Deposit
+## lcu-autobank
+
+Turn autobanking feature on / off.
+
+Enabling `autobank™` feature will allow The Lethal Credit Union Bank to deposit your allowed scrap items at the end of a game round.\
+This will not deposit items ignored in config.
+
+## lcu-balance
+
+Check up on your balance at your local LCU bank.
+
+## lcu-deposit
 
 Deposit scrap into your local LCU bank.
 
-## Withdraw
+This will not deposit items ignored in config.
+
+## lcu-withdraw
 
 Withdraw money from your local LCU bank.
 
-## Balance
+## lcu-balance
+
+Check up on your balance at your local LCU bank.
+
+## lcu-credits
 
 Check up on your balance at your local LCU bank.
 
 # Future plans
 
+- Add more detail in this README
 - Add an ATM ship upgrade - requires a credit card
 - Add a credit card item - not scrap but required to access the ATM
 
-# TO FIX
+# POSSIBLE Issues
 
-- save scum: deposit -> go to map -> exit/dc game
+- Some kind of way to lose / gain balance upon exiting (save scumming) - this might have been fixed by now but please be aware :)

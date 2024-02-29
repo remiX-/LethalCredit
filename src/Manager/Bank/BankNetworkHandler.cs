@@ -243,6 +243,20 @@ internal class BankNetworkHandler : NetworkBehaviour
         HudUtils.DisplayNotification($"LCU has banked ${amount} credits. Balance: ${SaveManager.SaveData.BankBalance}");
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    internal void ToggleAutobankStatusServerRpc()
+    {
+        ToggleAutobankStatusClientRpc();
+    }
+
+    [ClientRpc]
+    private void ToggleAutobankStatusClientRpc()
+    {
+        Plugin.Instance.PluginConfig.AutoBankAtEndOfRound = !Plugin.Instance.PluginConfig.AutoBankAtEndOfRound;
+
+        HudUtils.DisplayNotification($"Autobank has been {(Plugin.Instance.PluginConfig.AutoBankAtEndOfRound ? "enabled" : "disabled")}");
+    }
+
     #region BETA Testing
 
     [ClientRpc]

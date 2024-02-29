@@ -37,7 +37,7 @@ internal class PluginConfig
         AutoBankAtEndOfRound = configFile.Bind(
             "Bank",
             "Auto bank scrap at end of round",
-            true,
+            false,
             "[HOST] Whether the bank will automatically deposit all your scrap after leaving a moon."
         ).Value;
 
@@ -61,7 +61,7 @@ internal class PluginConfig
             "Debug",
             "ShowDebugLogs",
             false,
-            "[CLIENT] Turn on/off debug logs."
+            "[CLIENT] Turn on/off specific debug logs."
         ).Value;
         #endregion
 
