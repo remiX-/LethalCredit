@@ -6,7 +6,6 @@ $Version = $xml.Project.PropertyGroup.Version
 $ZipFile = "$ReleaseDir\LethalCredit_$Version.zip"
 $ReleaseAssetBundleArtifact = "$PSScriptRoot\src\Assets\modnetworkhandlerbundle"
 $ReleaseDllArtifact = "$PSScriptRoot\src\bin\Release\netstandard2.1\LethalCredit.dll"
-$ReleaseXmlDocsArtifact = "$PSScriptRoot\src\bin\Release\netstandard2.1\LethalCredit.xml"
 
 Write-Output "Creating build for LethalCredit v$Version"
 
