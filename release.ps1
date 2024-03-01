@@ -4,7 +4,7 @@ $ReleaseDir = "$DistDir\release"
 $xml = [xml](Get-Content $PSScriptRoot\src\LethalCredit.csproj)
 $Version = $xml.Project.PropertyGroup.Version
 $ZipFile = "$ReleaseDir\LethalCredit_$Version.zip"
-$ReleaseAssetBundleArtifact = "$PSScriptRoot\src\Assets\modnetworkhandlerbundle"
+$ReleaseAssetBundleArtifact = "$PSScriptRoot\src\Assets\lethalcreditbundle"
 $ReleaseDllArtifact = "$PSScriptRoot\src\bin\Release\netstandard2.1\LethalCredit.dll"
 
 Write-Output "Creating build for LethalCredit v$Version"

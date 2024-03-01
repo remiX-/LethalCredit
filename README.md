@@ -37,11 +37,19 @@ Check up on your balance at your local LCU bank.
 
 Check up on your balance at your local LCU bank.
 
+## Balance saving
+
+Your balance saves with the "SaveNumber" in the games AppData path.
+
+**Note:** Deleting a save will cause this to go out of sync. use **lcu-force** to sync it again.\
+The saving feature will be improved over time.
+
 # Future plans
 
 - Add more detail in this README
 - Add an ATM ship upgrade - requires a credit card
 - Add a credit card item - not scrap but required to access the ATM
+- Move "balance" saving into the actual save file instead of an isolated JSON file
 
 # POSSIBLE Issues
 

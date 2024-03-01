@@ -115,7 +115,7 @@ public class Plugin : BaseUnityPlugin
         );
 
         // cc
-        var cc = AssetManager.LoadBundleAsset<Item>("CreditCard");
+        var cc = AssetManager.LoadBundleAsset<Item>("LCUCreditCard");
         Utilities.FixMixerGroups(cc.spawnPrefab);
         NetworkPrefabs.RegisterNetworkPrefab(cc.spawnPrefab);
 

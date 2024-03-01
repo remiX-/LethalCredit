@@ -1,3 +1,7 @@
+# 0.1.1 (beta.1.1)
+
+- Fixed bundle not being included in the mod package
+
 # 0.1.0 (beta.1)
 
 - Introduced your friendly bank, The Lethal Credit Union
