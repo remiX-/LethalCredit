@@ -25,7 +25,7 @@ internal class BankNetworkHandler : NetworkBehaviour
 
         if (IsHost)
         {
-            SaveGame += AutobankScrap;
+            DisplayDaysLeft += _ => AutobankScrap();
 
             return;
         }
@@ -164,7 +164,7 @@ internal class BankNetworkHandler : NetworkBehaviour
         Logger.TryLogDebug($"Successfully synced values of {prop.itemProperties.itemName}");
     }
 
-    private void AutobankScrap(GameNetworkManager instance)
+    private void AutobankScrap()
     {
         if (!Plugin.Instance.PluginConfig.AutoBankAtEndOfRound)
         {
@@ -172,24 +172,22 @@ internal class BankNetworkHandler : NetworkBehaviour
             return;
         }
 
-        Logger.TryLogDebug($"On moon: {GameUtils.CurrentPlanet()} | {GameUtils.CurrentLevel()} | {GameUtils.IsOnCompany()} | isDC? {instance.isDisconnecting}");
-        if (instance.isDisconnecting) return;
-
         if (GameUtils.IsOnCompany())
         {
             Logger.TryLogDebug("On the company, will not autobank");
             return;
         }
 
+        Logger.LogDebug("Autobank starting...");
+
         var scrapToBank = ScrapUtils.GetAllIncludedScrapInShip(Plugin.Instance.PluginConfig.BankIgnoreList);
         if (!scrapToBank.Any())
         {
-            Logger.LogDebug("No items to autobank on round ended.");
+            Logger.LogDebug(" > No items to autobank on round ended.");
             return;
         }
 
         var totalValue = 0;
-        Logger.LogDebug("Autobank starting...");
 
         foreach (var go in scrapToBank)
         {

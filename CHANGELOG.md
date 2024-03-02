@@ -1,3 +1,7 @@
+# 0.1.2 (beta.1.2)
+
+- Changed when Autobank occurs from SaveGame to DisplayDaysLeft due to scrap coming back after leaving during a moon
+
 # 0.1.1 (beta.1.1)
 
 - Fixed bundle not being included in the mod package
