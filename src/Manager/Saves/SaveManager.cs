@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.IO;
-using UnityEngine;
 using static QualityCompany.Service.GameEvents;
 
 namespace LethalCredit.Manager.Saves;
@@ -14,8 +12,7 @@ internal class SaveManager
 
     private static bool IsHost => GameNetworkManager.Instance.isHostingGame;
 
-    private static string _saveFileName;
-    private static string _saveFilePath;
+    private const string SaveDataKey = "UMNO_LCU_DATA";
 
     internal static void Init()
     {
@@ -35,7 +32,6 @@ internal class SaveManager
             if (!instance.allPlayersDead) return;
 
             SaveData.BankBalance = 0;
-            Save();
         };
 
         PlayersFired += _ =>
@@ -49,44 +45,35 @@ internal class SaveManager
     {
         if (!IsHost) return;
 
-        var saveNum = GameNetworkManager.Instance.saveFileNum;
-        Logger.TryLogDebug($"HOST: using save data file in slot number {saveNum}");
-        _saveFileName = $"{PluginMetadata.PLUGIN_NAME}_{saveNum}.json";
-        _saveFilePath = Path.Combine(Application.persistentDataPath, _saveFileName);
+        var saveFile = GameNetworkManager.Instance.currentSaveFileName;
+        Logger.LogDebug($"HOST: using game save file at {saveFile}");
 
-        if (File.Exists(_saveFilePath))
+        var json = (string)ES3.Load(key: SaveDataKey, defaultValue: null, filePath: saveFile);
+        if (json is not null)
         {
-            Logger.TryLogDebug($"Loading save file: {_saveFileName}");
-            var json = File.ReadAllText(_saveFilePath);
+            Logger.LogDebug(" > data found! loading...");
             LoadSaveJson(json);
         }
         else
         {
-            Logger.TryLogDebug($"No save file found: {_saveFileName}, creating new");
-            SaveData = new GameSaveData();
+            Logger.LogDebug(" > no data! starting new...");
             Save();
         }
-
-        Logger.LogDebug(JsonConvert.SerializeObject(SaveData));
-        Plugin.Instance.PluginConfig.DebugPrintConfig(Logger);
     }
 
     internal static void Save()
     {
         if (!IsHost) return;
 
-        Logger.TryLogDebug($"Saving save data to {_saveFileName}");
+        var saveFile = GameNetworkManager.Instance.currentSaveFileName;
         var json = JsonConvert.SerializeObject(SaveData);
-        File.WriteAllText(_saveFilePath, json);
+        ES3.Save(key: SaveDataKey, value: json, filePath: saveFile);
     }
 
     internal static void ClientLoadFromString(string saveJson)
     {
         Logger.TryLogDebug("CLIENT: Save file received from host, updating.");
         LoadSaveJson(saveJson);
-
-        Logger.TryLogDebug(JsonConvert.SerializeObject(SaveData));
-        Plugin.Instance.PluginConfig.DebugPrintConfig(Logger);
     }
 
     private static void LoadSaveJson(string saveJson)
@@ -99,6 +86,9 @@ internal class SaveManager
             {
                 BankBalance = jsonSaveData.BankBalance
             };
+
+            Logger.TryLogDebug(JsonConvert.SerializeObject(SaveData));
+            Plugin.Instance.PluginConfig.DebugPrintConfig(Logger);
         }
         catch (Exception ex)
         {

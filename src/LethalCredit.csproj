@@ -29,6 +29,9 @@
 		<Reference Include="Assembly-CSharp">
 			<HintPath>$(LethalCompanyGameSteamDirectory)\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
 		</Reference>
+		<Reference Include="Assembly-CSharp-firstpass">
+			<HintPath>$(LethalCompanyGameSteamDirectory)\Lethal Company_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+		</Reference>
 		<Reference Include="BepInEx">
 			<HintPath>$(BepInExDirectory)\core\BepInEx.dll</HintPath>
 		</Reference>
