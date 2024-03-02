@@ -1,6 +1,8 @@
 # 0.1.2 (beta.1.2)
 
 - Changed when Autobank occurs from SaveGame to DisplayDaysLeft due to scrap coming back after leaving during a moon
+- Updated saving functionality to use the current game save file instead of a separate json file
+  - **Note:** This will cause desync as it won't try fetch from old file format. Use `lcu-force` to re-update :)
 
 # 0.1.1 (beta.1.1)
 
