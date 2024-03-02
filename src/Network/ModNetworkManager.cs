@@ -3,14 +3,14 @@ using LethalCredit.Manager.Bank;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using static QualityCompany.Service.GameEvents;
+using static QualityCompany.Events.GameEvents;
 
 namespace LethalCredit.Network;
 
 internal class ModNetworkManager
 {
     private static GameObject? _networkPrefab;
-    private static readonly List<GameObject> _networkPrefabs = new ();
+    private static readonly List<GameObject> _networkPrefabs = new();
 
     internal static void Init()
     {

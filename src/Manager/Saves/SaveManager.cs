@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using static QualityCompany.Service.GameEvents;
+using static QualityCompany.Events.GameEvents;
 
 namespace LethalCredit.Manager.Saves;
 

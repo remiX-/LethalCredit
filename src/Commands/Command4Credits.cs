@@ -4,7 +4,6 @@ using QualityCompany.Manager.ShipTerminal;
 using QualityCompany.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LethalCredit.Commands;
 

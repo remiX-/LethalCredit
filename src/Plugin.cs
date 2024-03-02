@@ -70,7 +70,7 @@ public class Plugin : BaseUnityPlugin
         AdvancedTerminalRegistry.Register(Assembly.GetExecutingAssembly(), commandKeyword: "lcu", description: "Lethal Credit Union Bank, here to bank your scrap.");
 
         ModNetworkManager.Init();
-        QualityCompany.Service.GameEvents.StartOfRoundStart += _ =>
+        QualityCompany.Events.GameEvents.StartOfRoundStart += _ =>
         {
             Log.LogMessage("Registered to StartOfRoundStart");
             SaveManager.Init();

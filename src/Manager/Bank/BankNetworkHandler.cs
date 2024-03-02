@@ -1,12 +1,11 @@
-﻿using GameNetcodeStuff;
-using LethalCredit.Assets;
+﻿using LethalCredit.Assets;
 using LethalCredit.Manager.Saves;
 using Newtonsoft.Json;
 using QualityCompany.Utils;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
-using static QualityCompany.Service.GameEvents;
+using static QualityCompany.Events.GameEvents;
 
 namespace LethalCredit.Manager.Bank;
 
