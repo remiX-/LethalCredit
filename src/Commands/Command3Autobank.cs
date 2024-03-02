@@ -8,9 +8,10 @@ internal class Command3Autobank
     [TerminalCommand]
     private static TerminalCommandBuilder Autobank()
     {
+        AdvancedTerminal.AddGlobalTextReplacement("[lcu__autobankStatus]", () => Plugin.Instance.PluginConfig.AutoBankAtEndOfRound ? "on" : "off");
+
         return new TerminalCommandBuilder("lcu-autobank")
-            .WithHelpDescription("Status: [autobankStatus]\nTurn LCU autobank feature on / off. Autobank will automatically deposit all matching scrap at the end of a game round.\nNote:This does not update the config (yet)")
-            .AddTextReplacement("[autobankStatus]", () => Plugin.Instance.PluginConfig.AutoBankAtEndOfRound ? "on" : "off")
+            .WithHelpDescription("Status: [lcu__autobankStatus]\nTurn LCU autobank feature on / off. Autobank will automatically deposit all matching scrap at the end of a game round.\nNote:This does not update the config (yet)")
             .WithAction(() =>
             {
                 var newStatus = !Plugin.Instance.PluginConfig.AutoBankAtEndOfRound;
