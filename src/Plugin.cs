@@ -15,7 +15,7 @@ using LethalLib.Modules;
 namespace LethalCredit;
 
 [BepInPlugin(PluginMetadata.PLUGIN_GUID, PluginMetadata.PLUGIN_NAME, PluginMetadata.PLUGIN_VERSION)]
-[BepInDependency("umno.QualityCompany", "1.4.0")]
+[BepInDependency("umno.QualityCompany", "1.4.1")]
 #if DEBUG
 [BepInDependency("evaisa.lethallib")]
 #endif
