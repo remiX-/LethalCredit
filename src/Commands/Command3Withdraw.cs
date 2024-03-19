@@ -51,6 +51,8 @@ internal class Command3Withdraw
             {
                 _valueFor = SaveManager.SaveData.BankBalance;
                 _newBalance = 0;
+
+                return null;
             })
             .WithAction(() =>
             {
@@ -69,6 +71,8 @@ internal class Command3Withdraw
             {
                 _valueFor = TimeOfDay.Instance.profitQuota - TimeOfDay.Instance.quotaFulfilled;
                 _newBalance = SaveManager.SaveData.BankBalance - _valueFor;
+
+                return null;
             })
             .WithAction(() =>
             {
@@ -87,11 +91,11 @@ internal class Command3Withdraw
             .WithPreAction(input =>
             {
                 _valueFor = Convert.ToInt32(input);
-                if (_valueFor <= 0) return false;
+                if (_valueFor <= 0) return "posiotive";
 
                 _newBalance = SaveManager.SaveData.BankBalance - _valueFor;
 
-                return true;
+                return null;
             })
             .WithAction(() =>
             {

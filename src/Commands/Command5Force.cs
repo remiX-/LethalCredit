@@ -29,19 +29,20 @@ internal class Command5Force
             .WithInputMatch(@"^(\d+)$")
             .WithPreAction(input =>
             {
-                if (!NetworkManager.Singleton.IsHost) return false;
+                if (!NetworkManager.Singleton.IsHost) return "not host";
 
                 _value = Convert.ToInt32(input);
 
                 if (_value < 0) _value = 0;
 
-                BankNetworkHandler.Instance.SyncBankBalanceClientRpc(_value);
-
-                return true;
+                return null;
             })
-            .WithAction(() =>
+            .WithAction(input =>
             {
-                // sorry
+                _value = Convert.ToInt32(input);
+
+                if (_value < 0) _value = 0;
+                BankNetworkHandler.Instance.SyncBankBalanceClientRpc(_value);
             });
     }
 }

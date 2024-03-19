@@ -50,6 +50,8 @@ internal class Command4Credits
                 _bankValueFor = BankUtils.GetBankAmountForCredits(_creditsFor);
                 _newCredits = 0;
                 _newBalance = SaveManager.SaveData.BankBalance + _bankValueFor;
+
+                return null;
             })
             .WithAction(() =>
             {
@@ -72,13 +74,13 @@ internal class Command4Credits
             .WithPreAction(input =>
             {
                 _creditsFor = Convert.ToInt32(input);
-                if (_creditsFor <= 0) return false;
+                if (_creditsFor <= 0) return "positive";
 
                 _bankValueFor = BankUtils.GetBankAmountForCredits(_creditsFor);
                 _newCredits = GameUtils.Terminal.groupCredits - _creditsFor;
                 _newBalance = SaveManager.SaveData.BankBalance + _bankValueFor;
 
-                return true;
+                return null;
             })
             .WithAction(() =>
             {
