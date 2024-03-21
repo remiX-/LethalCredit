@@ -55,8 +55,6 @@ internal class Command2Deposit
             {
                 _recommendedScraps = ScrapUtils.GetAllIncludedScrapInShip(Plugin.Instance.PluginConfig.BankIgnoreList);
                 _valueFor = _recommendedScraps.ActualScrapValueOfCollection();
-
-                return null;
             })
             .WithAction(() =>
             {
@@ -80,8 +78,6 @@ internal class Command2Deposit
                     .OrderBy(x => x.itemProperties.name)
                     .ThenByDescending(x => x.scrapValue)
                     .ToList();
-
-                return null;
             })
             .WithAction(() =>
             {

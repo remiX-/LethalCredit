@@ -104,9 +104,10 @@ internal class BankNetworkHandler : NetworkBehaviour
     [ClientRpc]
     private void DepositClientRpc(int depositValue)
     {
+        var oldBalance = SaveManager.SaveData.BankBalance;
         SaveManager.SaveData.BankBalance += depositValue;
 
-        HudUtils.DisplayNotification($"LCU balance has increased to ${SaveManager.SaveData.BankBalance}");
+        HudUtils.DisplayNotification($"LCU balance has increased from ${oldBalance} to ${SaveManager.SaveData.BankBalance}");
     }
 
     [ServerRpc(RequireOwnership = false)]
