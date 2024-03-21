@@ -27,16 +27,6 @@ internal class Command5Force
             .WithMessage("Your new balance: [bankBalance]")
             .WithConditions("isHost")
             .WithInputMatch(@"^(\d+)$")
-            .WithPreAction(input =>
-            {
-                if (!NetworkManager.Singleton.IsHost) return "not host";
-
-                _value = Convert.ToInt32(input);
-
-                if (_value < 0) _value = 0;
-
-                return null;
-            })
             .WithAction(input =>
             {
                 _value = Convert.ToInt32(input);

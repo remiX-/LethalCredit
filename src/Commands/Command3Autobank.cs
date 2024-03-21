@@ -11,7 +11,7 @@ internal class Command3Autobank
         AdvancedTerminal.AddGlobalTextReplacement("[lcu__autobankStatus]", () => Plugin.Instance.PluginConfig.AutoBankAtEndOfRound ? "on" : "off");
 
         return new TerminalCommandBuilder("lcu-autobank")
-            .WithHelpDescription("Status: [lcu__autobankStatus]\nTurn LCU autobank feature on / off. Autobank will automatically deposit all matching scrap at the end of a game round.\nNote:This does not update the config (yet)")
+            .WithHelpDescription("Status: [lcu__autobankStatus]\nTurn LCU autobank feature on / off. Autobank will automatically deposit all matching scrap at the end of a game round.\nNote:This does not update the config")
             .WithAction(() =>
             {
                 var newStatus = !Plugin.Instance.PluginConfig.AutoBankAtEndOfRound;
@@ -20,7 +20,7 @@ internal class Command3Autobank
 
                 if (newStatus)
                 {
-                    return "Autobank has been enabled! All matching scrap at the end of game rounds will be automatically banked into LCU Bank.";
+                    return "Autobank has been enabled!\n\nAll matching scrap at the end of game rounds will be automatically banked into LCU Bank.";
                 }
 
                 return "Autobank has been disabled!";
