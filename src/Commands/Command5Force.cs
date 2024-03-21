@@ -27,21 +27,12 @@ internal class Command5Force
             .WithMessage("Your new balance: [bankBalance]")
             .WithConditions("isHost")
             .WithInputMatch(@"^(\d+)$")
-            .WithPreAction(input =>
+            .WithAction(input =>
             {
-                if (!NetworkManager.Singleton.IsHost) return false;
-
                 _value = Convert.ToInt32(input);
 
                 if (_value < 0) _value = 0;
-
                 BankNetworkHandler.Instance.SyncBankBalanceClientRpc(_value);
-
-                return true;
-            })
-            .WithAction(() =>
-            {
-                // sorry
             });
     }
 }

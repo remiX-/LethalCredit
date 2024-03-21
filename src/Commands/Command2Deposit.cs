@@ -74,16 +74,10 @@ internal class Command2Deposit
             {
                 _valueFor = Convert.ToInt32(input);
 
-                if (_valueFor <= 0) return false;
-
                 _recommendedScraps = GetScrapForDeposit(_valueFor)
                     .OrderBy(x => x.itemProperties.name)
                     .ThenByDescending(x => x.scrapValue)
                     .ToList();
-
-                if (_recommendedScraps.Count == 0) return false;
-
-                return true;
             })
             .WithAction(() =>
             {

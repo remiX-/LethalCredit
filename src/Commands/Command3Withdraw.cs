@@ -87,11 +87,7 @@ internal class Command3Withdraw
             .WithPreAction(input =>
             {
                 _valueFor = Convert.ToInt32(input);
-                if (_valueFor <= 0) return false;
-
                 _newBalance = SaveManager.SaveData.BankBalance - _valueFor;
-
-                return true;
             })
             .WithAction(() =>
             {

@@ -3,13 +3,11 @@ using LethalCredit.Manager.Saves;
 using QualityCompany.Manager.ShipTerminal;
 using QualityCompany.Utils;
 using System;
-using System.Collections.Generic;
 
 namespace LethalCredit.Commands;
 
 internal class Command4Credits
 {
-    private static List<GrabbableObject> _recommendedScraps = new();
     private static int _creditsFor;
     private static int _bankValueFor;
     private static int _newCredits;
@@ -72,13 +70,9 @@ internal class Command4Credits
             .WithPreAction(input =>
             {
                 _creditsFor = Convert.ToInt32(input);
-                if (_creditsFor <= 0) return false;
-
                 _bankValueFor = BankUtils.GetBankAmountForCredits(_creditsFor);
                 _newCredits = GameUtils.Terminal.groupCredits - _creditsFor;
                 _newBalance = SaveManager.SaveData.BankBalance + _bankValueFor;
-
-                return true;
             })
             .WithAction(() =>
             {
