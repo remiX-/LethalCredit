@@ -15,7 +15,7 @@ using UnityEngine;
 namespace LethalCredit;
 
 [BepInPlugin(PluginMetadata.PLUGIN_GUID, PluginMetadata.PLUGIN_NAME, PluginMetadata.PLUGIN_VERSION)]
-[BepInDependency("umno.QualityCompany", "1.4.1")]
+[BepInDependency("umno.QualityCompany", "1.5.0")]
 // #if DEBUG
 // [BepInDependency("evaisa.lethallib")]
 // #endif
