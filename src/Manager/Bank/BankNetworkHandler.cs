@@ -86,14 +86,23 @@ internal class BankNetworkHandler : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void DepositServerRpc(ulong[] networkObjectId)
     {
+        Logger.LogDebugMode($"DepositServerRpc");
+        foreach (var ul in networkObjectId)
+        {
+            Logger.LogDebugMode($"  {networkObjectId}");
+        }
+
         var scraps = ScrapUtils
             .GetAllScrapInShip()
-            .Where(x => networkObjectId.Contains(x.NetworkObjectId));
+            .Where(x => networkObjectId.Contains(x.NetworkObjectId))
+            .ToList();
 
+        Logger.LogDebugMode($"  Scraps found count: {scraps.Count}");
         var totalValue = 0;
 
         foreach (var go in scraps)
         {
+            Logger.LogDebugMode($"  {networkObjectId}");
             totalValue += go.scrapValue;
             go.GetComponent<NetworkObject>().Despawn();
         }

@@ -1,3 +1,7 @@
+# 0.1.4 (beta.1.4)
+
+- Update for latest game version xD
+
 # 0.1.3 (beta.1.3)
 
 - Updated QualityCompany dependency version + some terminal qol fixes
